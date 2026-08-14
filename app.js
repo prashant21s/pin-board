@@ -39,7 +39,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-const cors = require("cors");
+
 app.use(cors({
   origin: process.env.CLIENT_URL,   // e.g. https://pin-board-1.onrender.com
   credentials: true
