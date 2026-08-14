@@ -24,8 +24,9 @@ app.use(expressSession({
   saveUninitialized: false,
   secret: process.env.SESSION_SECRET,
   cookie: {
-    sameSite: "lax", // dev ke liye "lax" theek hai, production me "none" + secure:true chahiye hoga
-    secure: false     // localhost pe false, deploy karte waqt true karna padega (HTTPS ke liye)
+    secure: true,       // production mein true hona chahiye (HTTPS)
+    sameSite: "none",   // cross-domain cookie ke liye zaroori
+    httpOnly: true
   }
 }))
 app.use(passport.initialize());
@@ -38,9 +39,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+const cors = require("cors");
 app.use(cors({
-  origin: "http://localhost:5173", // React app ka address (baad me change karenge)
-  credentials: true // ye zaroori hai kyunki hum session cookies use kar rahe hain
+  origin: process.env.CLIENT_URL,   // e.g. https://pin-board-1.onrender.com
+  credentials: true
 }));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
