@@ -105,9 +105,14 @@ router.post("/register", function (req, res) {
   });
 
   userModel.register(userData, req.body.password)
-    .then(async function () {
-      await sendVerificationEmail(req.body.email, token);
-      res.status(201).json({ success: true, message: "Check your email to verify your account" });
+    .then(async function (registeredUser) {
+      try {
+        await sendVerificationEmail(req.body.email, token);
+        res.status(201).json({ success: true, message: "Check your email to verify your account" });
+      } catch (err) {
+        await userModel.findByIdAndDelete(registeredUser._id);
+        res.status(502).json({ error: "Could not send verification email. Please try again later." });
+      }
     })
     .catch(function (err) {
       res.status(400).json({ error: err.message });
