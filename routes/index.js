@@ -1,7 +1,5 @@
 var express = require('express');
 var router = express.Router();
-const crypto = require('crypto');
-const sendVerificationEmail = require('../utils/sendEmail');
 const userModel = require("../models/users");
 const postModel = require("../models/post");
 const passport = require("passport");
@@ -96,23 +94,16 @@ router.get('/profile', isLoggedIn, async function (req, res, next) {
   }
 });
 router.post("/register", function (req, res) {
-  const token = crypto.randomBytes(32).toString('hex');
   const userData = new userModel({
     username: req.body.username,
     email: req.body.email,
     fullname: req.body.fullname,
-    verificationToken: token
+    isVerified: true
   });
 
   userModel.register(userData, req.body.password)
-    .then(async function (registeredUser) {
-      try {
-        await sendVerificationEmail(req.body.email, token);
-        res.status(201).json({ success: true, message: "Check your email to verify your account" });
-      } catch (err) {
-        await userModel.findByIdAndDelete(registeredUser._id);
-        res.status(502).json({ error: "Could not send verification email. Please try again later." });
-      }
+    .then(function () {
+      res.status(201).json({ success: true, message: "Account created successfully. You can log in now." });
     })
     .catch(function (err) {
       res.status(400).json({ error: err.message });
@@ -138,7 +129,6 @@ router.post("/login", function (req, res, next) {
   passport.authenticate("local", function (err, user, info) {
     if (err) return next(err);
     if (!user) return res.status(401).json({ error: "Invalid username or password" });
-    if (!user.isVerified) return res.status(403).json({ error: "Please verify your email first" });
     req.logIn(user, function (err) {
       if (err) return next(err);
       return res.json({ success: true, user: { username: user.username, fullname: user.fullname } });
