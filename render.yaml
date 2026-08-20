@@ -11,10 +11,7 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: CLIENT_URL
-        fromService:
-          type: web
-          name: pin-board
-          envVarKey: RENDER_EXTERNAL_URL
+        sync: false
       - key: MONGO_URI
         sync: false
       - key: CLOUDINARY_CLOUD_NAME
@@ -36,10 +33,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: pin-board-api
-          envVarKey: RENDER_EXTERNAL_URL
+        sync: false
     routes:
       - type: rewrite
         source: /*
