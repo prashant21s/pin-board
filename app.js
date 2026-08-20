@@ -12,6 +12,7 @@ var usersRouter = require('./models/users');
 const passport = require('passport');
 const flash = require("connect-flash");
 var app = express();
+app.set('trust proxy', 1);
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
