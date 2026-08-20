@@ -24,8 +24,8 @@ app.use(expressSession({
   saveUninitialized: false,
   secret: process.env.SESSION_SECRET,
   cookie: {
-    secure: true,       // production mein true hona chahiye (HTTPS)
-    sameSite: "none",   // cross-domain cookie ke liye zaroori
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     httpOnly: true
   }
 }))
